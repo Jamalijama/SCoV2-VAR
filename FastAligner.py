@@ -568,7 +568,7 @@ def ShortCutAlign(ref, seq, seqlen_5ter2map):
 # main FastAlign
 
 
-def FastAlign(seq, ref, xnt0, xnt1, dict_locs_xnts0, dict_locs_xnts1, seqlen_5ter2map):
+def FastAlign(seq, ref, xnt0, xnt1, dict_locs_xnts0, dict_locs_xnts1, seqlen_5ter2map, segLen):
     read_mapaligned = ''
     ref_mapaligned = ''
 
@@ -585,7 +585,7 @@ def FastAlign(seq, ref, xnt0, xnt1, dict_locs_xnts0, dict_locs_xnts1, seqlen_5te
     # default is the maximum unmatched value.
 
     mloc = 0
-    segLen = 500
+    # segLen = 500
     mapped_start_loc_lst = []
     skip_lst = []
 
