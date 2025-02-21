@@ -16,7 +16,6 @@ in_file = 'insert_dict.bz2'
 id_file = 'seq_id.csv'
 
 quality_ratio = 0.99
-freq_ham_score_thresh = 0.05
 
 
 def SortAndJudge(inloc_lst, inNts_lst):
@@ -232,19 +231,32 @@ def Comparison_Align(ref_file, all_file):
     print('-' * 50)
     for i in range(len(seq_lst)):
         seq_lst[i] = seq_lst[i].upper()
-        aligning = FastAlign(seq_lst[i], ref_seq, 'dnt', 'pnt',
-                             dict_locs_dnts, dict_locs_pnts, 40)
-        if len(aligning[0]) != len(ref_seq):
-            continue
-        else:
+        freq_ham_score_lst = []
+        tmp_aligning_lst = []
+        for j in range(300, 600, 100):
+            aligning = FastAlign(seq_lst[i], ref_seq, 'dnt', 'pnt',
+                                 dict_locs_dnts, dict_locs_pnts, 40, j)
             ham_score = ham_distance0(ref_seq, aligning[0])
             freq_ham_score = ham_score / reflen
-            if freq_ham_score <= freq_ham_score_thresh:
-                # print(seq_id_lst[i])
-                seq_id_lst_new.append(seq_id_lst[i])
-                seq_lst_new.append(aligning[0])
-                inloc_lst.append(aligning[3])
-                inNts_lst.append(aligning[4])
+            freq_ham_score_lst.append(freq_ham_score)
+            tmp_aligning_lst.append(aligning)
+        min_score = min(freq_ham_score_lst)
+        min_idx = freq_ham_score_lst.index(min_score)
+        opt_aligning = tmp_aligning_lst[min_idx]
+        mapflag = opt_aligning[0]
+        if mapflag:
+            seqlen = len(ref_seq)
+            if len(opt_aligning[0]) != len(ref_seq):
+                continue
+            else:
+                ham_score = ham_distance0(ref_seq, opt_aligning[0])
+                freq_ham_score = ham_score / seqlen
+                if freq_ham_score <= 1 - quality_ratio:
+                    print(seq_id_lst[i])
+                    seq_id_lst_new.append(seq_id_lst[i])
+                    seq_lst_new.append(opt_aligning[0])
+                    inloc_lst.append(opt_aligning[3])
+                    inNts_lst.append(opt_aligning[4])
 
     print('-' * 50)
 
